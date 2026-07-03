@@ -1306,13 +1306,13 @@ function restoreAuto() {
 
   const overlay = document.createElement('div');
   overlay.id = 'restore-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(53,74,94,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
 
   const box = document.createElement('div');
-  box.style.cssText = 'background:#ede8dc;border-radius:14px;padding:20px;width:100%;max-width:380px;max-height:80vh;overflow-y:auto';
+  box.style.cssText = 'background:#fff;border-radius:8px;padding:20px;width:100%;max-width:380px;max-height:80vh;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.2)';
 
   const title = document.createElement('div');
-  title.style.cssText = 'font-size:16px;font-weight:bold;color:#c47a1a;margin-bottom:14px';
+  title.style.cssText = 'font-size:16px;font-weight:bold;color:#354a5e;margin-bottom:14px;border-bottom:2px solid #0a6ed1;padding-bottom:8px';
   title.textContent = '保存済みデータを選択';
   box.appendChild(title);
 
@@ -1324,14 +1324,14 @@ function restoreAuto() {
     } catch(e) {}
 
     const row = document.createElement('div');
-    row.style.cssText = 'background:#e0d8c8;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center';
+    row.style.cssText = 'background:#f5f6f7;border:1px solid #e0e0e0;border-radius:6px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center';
 
     const nameSpan = document.createElement('span');
-    nameSpan.style.cssText = 'font-size:14px;color:#1a1a1a;flex:1';
+    nameSpan.style.cssText = 'font-size:14px;color:#32363a;flex:1';
     nameSpan.textContent = label;
 
     const btn = document.createElement('button');
-    btn.style.cssText = 'font-size:13px;color:#fff;background:#c0392b;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;flex-shrink:0;margin-left:8px';
+    btn.style.cssText = 'font-size:13px;color:#fff;background:#0a6ed1;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;flex-shrink:0;margin-left:8px';
     btn.textContent = '復元';
     btn.addEventListener('click', () => doRestore(k));
 
@@ -1341,15 +1341,15 @@ function restoreAuto() {
   });
 
   const btnRow = document.createElement('div');
-  btnRow.style.cssText = 'display:flex;gap:8px;margin-top:8px';
+  btnRow.style.cssText = 'display:flex;gap:8px;margin-top:12px';
 
   const delBtn = document.createElement('button');
-  delBtn.style.cssText = 'flex:1;background:none;border:1px solid #c0392b;border-radius:8px;color:#c0392b;padding:10px;font-size:13px;cursor:pointer';
+  delBtn.style.cssText = 'flex:1;background:#fff;border:1px solid #e00;border-radius:4px;color:#e00;padding:10px;font-size:13px;cursor:pointer';
   delBtn.textContent = '全て削除';
   delBtn.addEventListener('click', clearAllSaved);
 
   const cancelBtn = document.createElement('button');
-  cancelBtn.style.cssText = 'flex:1;background:#e0d8c8;border:none;border-radius:8px;color:#1a1a1a;padding:10px;font-size:13px;cursor:pointer';
+  cancelBtn.style.cssText = 'flex:1;background:#f5f6f7;border:1px solid #bbb;border-radius:4px;color:#354a5e;padding:10px;font-size:13px;cursor:pointer';
   cancelBtn.textContent = 'キャンセル';
   cancelBtn.addEventListener('click', () => document.getElementById('restore-overlay').remove());
 
@@ -1835,55 +1835,25 @@ function addPlayer() {
       <div style="font-size:16px;font-weight:bold;color:var(--c-yellow);margin-bottom:10px">⑦ このアプリのスマホへの入れ方</div>
 
       <div style="background:var(--c-panel);border-radius:8px;padding:12px;margin-bottom:12px;border-left:3px solid var(--c-accent)">
-        <div style="font-size:13px;font-weight:bold;color:var(--c-accent);margin-bottom:6px">STEP 1　ダウンロード</div>
+        <div style="font-size:13px;font-weight:bold;color:var(--c-accent);margin-bottom:6px">STEP 1　Safariでアクセス</div>
         <ol style="margin:0 0 0 16px;font-size:13px;color:var(--c-muted);line-height:2">
-          <li>下の「Google Drive を開く」をタップ</li>
-          <li><b style="color:var(--c-text)">KOGANEI MBBC.html</b> を長押し（または右上 ︙）</li>
-          <li><b style="color:var(--c-text)">「ダウンロード」</b>をタップ</li>
-          <li>ダウンロード完了後、<b style="color:var(--c-text)">「Filesで開く」</b>をタップ</li>
+          <li>iPhoneの <b style="color:var(--c-text)">Safari</b> を開く</li>
+          <li>アドレスバーに以下を入力：<br><b style="color:var(--c-text);font-size:12px">koganeimen.github.io/koganei-mbbc/</b></li>
+          <li>アプリが表示されることを確認</li>
         </ol>
-      </div>
-
-      <div style="background:var(--c-panel);border-radius:8px;padding:12px;margin-bottom:12px;border-left:3px solid var(--c-accent)">
-        <div style="font-size:13px;font-weight:bold;color:var(--c-accent);margin-bottom:8px">STEP 2　Safariで開く（重要）</div>
-
-        <p style="font-size:13px;color:var(--c-muted);margin-bottom:6px"><b style="color:var(--c-text)">方法A（一番簡単）</b></p>
-        <ol style="margin:0 0 10px 16px;font-size:13px;color:var(--c-muted);line-height:2">
-          <li><b style="color:var(--c-text)">SafariでGoogle Driveを開く</b>（Google Driveアプリではなく）</li>
-          <li>ファイルをタップ → プレビューが開く</li>
-          <li>右上の <b style="color:var(--c-text)">「︙」または共有ボタン</b> → <b style="color:var(--c-text)">「ダウンロード」</b></li>
-          <li>ダウンロード完了後、Safariの <b style="color:var(--c-text)">↓アイコン</b>（アドレスバー右横）をタップ</li>
-          <li>ファイル名をタップ → そのままSafariで開く ✅</li>
-        </ol>
-
-        <p style="font-size:13px;color:var(--c-muted);margin-bottom:6px"><b style="color:var(--c-text)">方法B（Filesアプリから）</b></p>
-        <ol style="margin:0 0 0 16px;font-size:13px;color:var(--c-muted);line-height:2">
-          <li>Filesアプリ → ファイルを<b style="color:var(--c-text)">長押し</b></li>
-          <li><b style="color:var(--c-text)">「情報を見る」</b>をタップ</li>
-          <li>「デフォルトのアプリ」→ <b style="color:var(--c-text)">Safari</b> を選択</li>
-          <li>以降はタップするだけでSafariで開く ✅</li>
-        </ol>
-
-        <p style="font-size:12px;color:var(--c-accent);margin-top:10px">⚠️ Safariで開かないとExcel書き込み・JSON保存が使えません</p>
       </div>
 
       <div style="background:var(--c-panel);border-radius:8px;padding:12px;margin-bottom:12px;border-left:3px solid var(--c-green)">
-        <div style="font-size:13px;font-weight:bold;color:var(--c-green);margin-bottom:6px">STEP 3　ホーム画面に追加</div>
+        <div style="font-size:13px;font-weight:bold;color:var(--c-green);margin-bottom:6px">STEP 2　ホーム画面に追加</div>
         <ol style="margin:0 0 0 16px;font-size:13px;color:var(--c-muted);line-height:2">
-          <li>Safariでアプリが開いたら、下部の <b style="color:var(--c-text)">共有ボタン（□↑）</b>をタップ</li>
+          <li>Safari下部の <b style="color:var(--c-text)">共有ボタン（□↑）</b>をタップ</li>
           <li><b style="color:var(--c-text)">「ホーム画面に追加」</b>をタップ</li>
           <li>名前を確認して <b style="color:var(--c-text)">「追加」</b>をタップ</li>
-          <li>ホーム画面にアイコンが追加され、アプリのように使えます</li>
+          <li>ホーム画面にアイコンが追加され、アプリのように起動できます ✅</li>
         </ol>
       </div>
 
-      <a href="https://drive.google.com/drive/folders/1ya8Cav_8ISoQb9czw7T4rS7rJvx64fRE"
-         target="_blank"
-         style="display:block;margin-top:4px;background:var(--c-accent);color:#fff;border-radius:8px;
-                padding:12px 16px;text-align:center;font-size:14px;font-weight:bold;text-decoration:none">
-        📂 Google Drive を開く
-      </a>
-      <p style="margin-top:10px;font-size:12px;color:var(--c-muted)">※ 最新バージョンのファイルが保存されています</p>
+      <p style="font-size:12px;color:var(--c-accent);margin-top:4px">⚠️ ChromeではなくSafariで開かないとExcel書き込みが使えません</p>
     </div>
 
     <div style="background:var(--c-card);border-radius:12px;padding:14px 16px;margin-bottom:14px">
