@@ -43,7 +43,7 @@ function onExcelFileSelected(event) {
   reader.readAsArrayBuffer(file);
 }
 
-async function writeToExcel() {
+function writeToExcel() {
   if(!excelWorkbookData) { alert('先にExcelファイルを選択してください'); return; }
   if(typeof XLSX === 'undefined') { alert('SheetJSが読み込まれていません。オンライン環境で開いてください。'); return; }
 
@@ -95,8 +95,9 @@ async function writeToExcel() {
     const dlBlob = new Blob([wbout], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
     const file = new File([dlBlob], outName, {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 
-    // Try Web Share API first (works on iOS Safari + Chrome)
-    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
+    // iOS Safari only: use Web Share API (Chrome on iOS reloads page on share)
+    const isIosSafari = /iP(hone|ad|od)/.test(navigator.userAgent) && !navigator.userAgent.includes('CriOS') && !navigator.userAgent.includes('FxiOS');
+    if(isIosSafari && navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
       status.style.color = 'var(--c-green)';
       status.textContent = '✓ 完了！「' + sheetName + '」を追加しました。';
       navigator.share({files:[file], title: outName})
@@ -104,20 +105,7 @@ async function writeToExcel() {
       return;
     }
 
-    // Try Web Share without canShare check (for some Chrome versions)
-    if(navigator.share) {
-      try {
-        status.style.color = 'var(--c-green)';
-        status.textContent = '✓ 完了！「' + sheetName + '」を追加しました。';
-        await navigator.share({files:[file], title: outName});
-        return;
-      } catch(e) {
-        if(e.name === 'AbortError') return;
-        // fall through to blob download
-      }
-    }
-
-    // Desktop / Android Chrome: blob download
+    // Chrome / Desktop: blob download
     try {
       const dlUrl = URL.createObjectURL(dlBlob);
       const dlA = document.createElement('a');
@@ -552,7 +540,7 @@ function writeStatsToSheet(ws) {
 <!-- ===== SETUP SCREEN ===== -->
 <div id="setup-screen" class="screen active">
   <h1>🏀 スタッツ入力</h1>
-  <div style="text-align:right;font-size:10px;color:var(--c-muted);margin-top:-12px;margin-bottom:8px">v20260703 09:55</div>
+  <div style="text-align:right;font-size:10px;color:var(--c-muted);margin-top:-12px;margin-bottom:8px">v20260703 10:05</div>
   <div class="field-group">
     <div class="field-label">試合日</div>
     <input type="date" id="setup-date">
