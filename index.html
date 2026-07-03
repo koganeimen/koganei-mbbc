@@ -88,9 +88,9 @@ function writeToExcel() {
 
     // Download / Share
     const d2 = gameData.info;
-    const mmddMatch = (d2.date||'').match(/^\d{4}-(\d{2})-(\d{2})/);
-    const mmdd = mmddMatch ? mmddMatch[1]+mmddMatch[2] : 'new';
-    const outName = 'stats_' + mmdd + '.xlsx';
+    const yyyymmddMatch = (d2.date||'').match(/^(\d{4})-(\d{2})-(\d{2})/);
+    const yyyymmdd = yyyymmddMatch ? yyyymmddMatch[1]+yyyymmddMatch[2]+yyyymmddMatch[3] : 'new';
+    const outName = 'stats_' + yyyymmdd + '.xlsx';
     const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
     const dlBlob = new Blob([wbout], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 
@@ -681,12 +681,10 @@ document.addEventListener('visibilitychange', () => {
   if(document.visibilityState === 'hidden') autoSave();
 });
 
-// ── Warn before closing if game is in progress ──
+// ── Auto-save before closing if game is in progress ──
 window.addEventListener('beforeunload', (e) => {
   if(document.getElementById('game-screen').classList.contains('active')) {
     autoSave();
-    e.preventDefault();
-    e.returnValue = '試合データが保存されていない可能性があります。';
   }
 });
 
@@ -1806,14 +1804,14 @@ function addPlayer() {
         <li>Filesアプリからファイルを選択（下記参照）</li>
         <li>シート名を確認・必要なら編集する</li>
         <li>「✍️ Excelに書き込む」をタップ</li>
-        <li><b>2026年度スタッツ_mmdd.xlsx</b> が自動でダウンロードされる</li>
+        <li><b>stats_yyyymmdd.xlsx</b> が自動でダウンロードされる</li>
       </ol>
       <p style="margin-top:10px;font-size:13px;color:var(--c-muted)">シート名：①20260702_川口マックス（試合順＋日付＋相手名）</p>
       <div style="margin-top:12px;background:var(--c-panel);border-radius:8px;padding:12px;border-left:3px solid var(--c-yellow)">
         <div style="font-size:13px;font-weight:bold;color:var(--c-yellow);margin-bottom:6px">⚠️ 1日複数試合の場合</div>
         <p style="font-size:13px;color:var(--c-muted);line-height:1.8">
-          <b style="color:var(--c-text)">1試合目</b>：最新の <b style="color:var(--c-yellow)">2026年度スタッツ_mmdd.xlsx</b> を選択<br>
-          <b style="color:var(--c-text)">2試合目以降</b>：前の試合でダウンロードした <b style="color:var(--c-yellow)">2026年度スタッツ_mmdd.xlsx</b> を選択
+          <b style="color:var(--c-text)">1試合目</b>：最新の <b style="color:var(--c-yellow)">stats_yyyymmdd.xlsx</b> を選択<br>
+          <b style="color:var(--c-text)">2試合目以降</b>：前の試合でダウンロードした <b style="color:var(--c-yellow)">stats_yyyymmdd.xlsx</b> を選択
         </p>
       </div>
       <p style="margin-top:8px;font-size:13px;color:var(--c-muted)">※ インターネット接続不要で書き込みできます</p>
@@ -1822,7 +1820,7 @@ function addPlayer() {
       <div style="margin-top:12px;background:var(--c-panel);border-radius:8px;padding:12px;border-left:3px solid var(--c-green)">
         <div style="font-size:13px;font-weight:bold;color:var(--c-green);margin-bottom:6px">📤 試合後にGoogle Driveへ保存</div>
         <p style="font-size:13px;color:var(--c-muted);line-height:1.8">
-          ダウンロードされた <b style="color:var(--c-text)">2026年度スタッツ_mmdd.xlsx</b> を Google Drive に保存してください。次回の試合でもそのファイルを選択することでシートが追加されます。
+          ダウンロードされた <b style="color:var(--c-text)">stats_yyyymmdd.xlsx</b> を Google Drive に保存してください。次回の試合でもそのファイルを選択することでシートが追加されます。
         </p>
         <a href="https://drive.google.com/drive/folders/1ya8Cav_8ISoQb9czw7T4rS7rJvx64fRE"
            target="_blank"
@@ -1918,8 +1916,8 @@ function addPlayer() {
     <div style="background:#e0d8c8;border:1px solid var(--c-yellow);border-radius:12px;padding:12px 16px">
       <div style="font-size:13px;font-weight:bold;color:var(--c-yellow);margin-bottom:6px">⚠️ 1日複数試合の場合</div>
       <p style="font-size:13px;color:var(--c-muted);line-height:1.7">
-        • <b style="color:var(--c-text)">1試合目</b>：最新の <b style="color:var(--c-yellow)">2026年度スタッツ_mmdd.xlsx</b> を選択<br>
-        • <b style="color:var(--c-text)">2試合目以降</b>：前の試合でダウンロードした <b style="color:var(--c-yellow)">2026年度スタッツ_mmdd.xlsx</b> を選択
+        • <b style="color:var(--c-text)">1試合目</b>：最新の <b style="color:var(--c-yellow)">stats_yyyymmdd.xlsx</b> を選択<br>
+        • <b style="color:var(--c-text)">2試合目以降</b>：前の試合でダウンロードした <b style="color:var(--c-yellow)">stats_yyyymmdd.xlsx</b> を選択
       </p>
     </div>
 
@@ -1950,7 +1948,7 @@ function addPlayer() {
 
     <div style="background:var(--c-card);border-radius:12px;padding:14px 16px">
       <div style="font-size:13px;color:var(--c-muted);margin-bottom:8px;font-weight:bold">STEP 3　ダウンロード</div>
-      <p style="font-size:13px;color:var(--c-muted)">書き込み後、<b style="color:var(--c-yellow)">2026年度スタッツ_mmdd.xlsx</b> が自動でダウンロードされます。</p>
+      <p style="font-size:13px;color:var(--c-muted)">書き込み後、<b style="color:var(--c-yellow)">stats_yyyymmdd.xlsx</b> が自動でダウンロードされます。</p>
       <p style="font-size:12px;color:var(--c-muted);margin-top:6px">元のファイルは変更されません。次の試合ではこのファイルを選択してください。</p>
       <div style="margin-top:10px;background:var(--c-bg);border-radius:8px;padding:10px;border-left:3px solid var(--c-green)">
         <p style="font-size:12px;color:var(--c-muted);line-height:1.8">
