@@ -43,7 +43,7 @@ function onExcelFileSelected(event) {
   reader.readAsArrayBuffer(file);
 }
 
-function writeToExcel() {
+async function writeToExcel() {
   if(!excelWorkbookData) { alert('先にExcelファイルを選択してください'); return; }
   if(typeof XLSX === 'undefined') { alert('SheetJSが読み込まれていません。オンライン環境で開いてください。'); return; }
 
@@ -93,20 +93,31 @@ function writeToExcel() {
     const outName = 'stats_' + yyyymmdd + '.xlsx';
     const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
     const dlBlob = new Blob([wbout], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const file = new File([dlBlob], outName, {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 
-    // iOS Safari: use Web Share API to save to Files/iCloud
-    if(navigator.share && navigator.canShare) {
-      const file = new File([dlBlob], outName, {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-      if(navigator.canShare({files:[file]})) {
+    // Try Web Share API first (works on iOS Safari + Chrome)
+    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
+      status.style.color = 'var(--c-green)';
+      status.textContent = '✓ 完了！「' + sheetName + '」を追加しました。';
+      navigator.share({files:[file], title: outName})
+        .catch(e => { if(e.name !== 'AbortError') showExcelBase64(wbout, outName, sheetName, status); });
+      return;
+    }
+
+    // Try Web Share without canShare check (for some Chrome versions)
+    if(navigator.share) {
+      try {
         status.style.color = 'var(--c-green)';
         status.textContent = '✓ 完了！「' + sheetName + '」を追加しました。';
-        navigator.share({files:[file], title: outName})
-          .catch(e => { if(e.name !== 'AbortError') showExcelBase64(wbout, outName, sheetName, status); });
+        await navigator.share({files:[file], title: outName});
         return;
+      } catch(e) {
+        if(e.name === 'AbortError') return;
+        // fall through to blob download
       }
     }
 
-    // Desktop: blob download
+    // Desktop / Android Chrome: blob download
     try {
       const dlUrl = URL.createObjectURL(dlBlob);
       const dlA = document.createElement('a');
@@ -541,7 +552,7 @@ function writeStatsToSheet(ws) {
 <!-- ===== SETUP SCREEN ===== -->
 <div id="setup-screen" class="screen active">
   <h1>🏀 スタッツ入力</h1>
-  <div style="text-align:right;font-size:10px;color:var(--c-muted);margin-top:-12px;margin-bottom:8px">v2026-07-03</div>
+  <div style="text-align:right;font-size:10px;color:var(--c-muted);margin-top:-12px;margin-bottom:8px">v20260703 09:55</div>
   <div class="field-group">
     <div class="field-label">試合日</div>
     <input type="date" id="setup-date">
