@@ -95,17 +95,27 @@ function writeToExcel() {
     const dlBlob = new Blob([wbout], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
     const file = new File([dlBlob], outName, {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 
-    // iOS Safari only: use Web Share API (Chrome on iOS reloads page on share)
     const isIosSafari = /iP(hone|ad|od)/.test(navigator.userAgent) && !navigator.userAgent.includes('CriOS') && !navigator.userAgent.includes('FxiOS');
+    const isIos = /iP(hone|ad|od)/.test(navigator.userAgent);
+
     if(isIosSafari && navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
+      // Safari: Web Share API → ネイティブ共有シート
       status.style.color = 'var(--c-green)';
       status.textContent = '✓ 完了！「' + sheetName + '」を追加しました。';
       navigator.share({files:[file], title: outName})
-        .catch(e => { if(e.name !== 'AbortError') showExcelBase64(wbout, outName, sheetName, status); });
+        .catch(e => { if(e.name !== 'AbortError') showIosChromeSave(wbout, outName, sheetName, status); });
       return;
     }
 
-    // Chrome / Desktop: blob download
+    if(isIos) {
+      // iOS Chrome など: data URLをモーダルで表示（ページ遷移なし）
+      status.style.color = 'var(--c-green)';
+      status.textContent = '✓ 完了！「' + sheetName + '」を追加しました。';
+      showIosChromeSave(wbout, outName, sheetName, status);
+      return;
+    }
+
+    // Desktop / Android: blob download
     try {
       const dlUrl = URL.createObjectURL(dlBlob);
       const dlA = document.createElement('a');
@@ -114,9 +124,9 @@ function writeToExcel() {
       document.body.removeChild(dlA);
       setTimeout(() => URL.revokeObjectURL(dlUrl), 1000);
       status.style.color = 'var(--c-green)';
-      status.textContent = '✓ 完了！「' + sheetName + '」を追加しました。\nファイルをダウンロードしました。';
+      status.textContent = '✓ 完了！「' + sheetName + '」を追加しました。';
     } catch(e) {
-      showExcelBase64(wbout, outName, sheetName, status);
+      showIosChromeSave(wbout, outName, sheetName, status);
     }
 
   } catch(e) {
@@ -540,7 +550,7 @@ function writeStatsToSheet(ws) {
 <!-- ===== SETUP SCREEN ===== -->
 <div id="setup-screen" class="screen active">
   <h1>🏀 スタッツ入力</h1>
-  <div style="text-align:right;font-size:10px;color:var(--c-muted);margin-top:-12px;margin-bottom:8px">v20260703 10:05</div>
+  <div style="text-align:right;font-size:10px;color:var(--c-muted);margin-top:-12px;margin-bottom:8px">v20260703 10:18</div>
   <div class="field-group">
     <div class="field-label">試合日</div>
     <input type="date" id="setup-date">
@@ -1425,6 +1435,48 @@ function exportJSON() {
   } catch(e) {
     showJsonFallback(json, fileName);
   }
+}
+
+function showIosChromeSave(wbout, fileName, sheetName, statusEl) {
+  // iOS Chrome: convert to base64 data URL and show in modal with long-press instructions
+  const u8 = new Uint8Array(wbout);
+  let bin = '';
+  for(let i = 0; i < u8.length; i++) bin += String.fromCharCode(u8[i]);
+  const b64 = btoa(bin);
+  const dataUrl = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + b64;
+
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(53,74,94,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+
+  const box = document.createElement('div');
+  box.style.cssText = 'background:#fff;border-radius:8px;padding:20px;width:100%;max-width:380px;box-shadow:0 4px 16px rgba(0,0,0,0.2)';
+
+  const title = document.createElement('div');
+  title.style.cssText = 'font-size:15px;font-weight:bold;color:#354a5e;border-bottom:2px solid #0a6ed1;padding-bottom:8px;margin-bottom:14px';
+  title.textContent = '✓ ' + fileName;
+  box.appendChild(title);
+
+  const msg = document.createElement('p');
+  msg.style.cssText = 'font-size:13px;color:#6a6d70;line-height:1.8;margin-bottom:14px';
+  msg.innerHTML = '下のボタンを<b>長押し</b> →「リンクを保存」でダウンロードできます。';
+  box.appendChild(msg);
+
+  const dlLink = document.createElement('a');
+  dlLink.href = dataUrl;
+  dlLink.download = fileName;
+  dlLink.style.cssText = 'display:block;background:#0a6ed1;color:#fff;border-radius:6px;padding:13px;text-align:center;font-size:15px;font-weight:bold;text-decoration:none;margin-bottom:10px';
+  dlLink.textContent = '📥 ' + fileName;
+  box.appendChild(dlLink);
+
+  const closeBtn = document.createElement('button');
+  closeBtn.style.cssText = 'width:100%;background:#f5f6f7;border:1px solid #bbb;border-radius:4px;color:#354a5e;padding:10px;font-size:13px;cursor:pointer';
+  closeBtn.textContent = '閉じる';
+  closeBtn.addEventListener('click', () => overlay.remove());
+  box.appendChild(closeBtn);
+
+  overlay.appendChild(box);
+  overlay.addEventListener('click', e => { if(e.target === overlay) overlay.remove(); });
+  document.body.appendChild(overlay);
 }
 
 function showExcelBase64(wbout, fileName, sheetName, statusEl) {
