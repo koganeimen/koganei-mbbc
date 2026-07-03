@@ -682,12 +682,7 @@ document.addEventListener('visibilitychange', () => {
   if(document.visibilityState === 'hidden') autoSave();
 });
 
-// ── Auto-save before closing if game is in progress ──
-window.addEventListener('beforeunload', (e) => {
-  if(document.getElementById('game-screen').classList.contains('active')) {
-    autoSave();
-  }
-});
+// beforeunload removed - caused mobile page reset when file picker opened
 
 function startGame() {
   const date = document.getElementById('setup-date').value;
