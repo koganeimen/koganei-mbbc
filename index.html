@@ -1232,10 +1232,10 @@ function setEmailTo() {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
   const box = document.createElement('div');
-  box.style.cssText = 'background:#ede8dc;border-radius:14px;padding:20px;width:100%;max-width:380px';
+  box.style.cssText = 'background:#fff;border-radius:8px;padding:20px;width:100%;max-width:380px;box-shadow:0 4px 16px rgba(0,0,0,0.2)';
 
   const title = document.createElement('div');
-  title.style.cssText = 'font-size:15px;font-weight:bold;color:#c47a1a;margin-bottom:14px';
+  title.style.cssText = 'font-size:15px;font-weight:bold;color:#354a5e;margin-bottom:14px;border-bottom:2px solid #0a6ed1;padding-bottom:8px';
   title.textContent = '✉️ メール送信先を設定';
   box.appendChild(title);
 
@@ -1243,12 +1243,12 @@ function setEmailTo() {
     const wrap = document.createElement('div');
     wrap.style.marginBottom = '12px';
     const lbl = document.createElement('div');
-    lbl.style.cssText = 'font-size:12px;color:#7a7060;margin-bottom:4px';
+    lbl.style.cssText = 'font-size:12px;color:#6a6d70;margin-bottom:4px;font-weight:bold';
     lbl.textContent = labelText;
     const inp = document.createElement('input');
     inp.type = 'email';
     inp.value = value;
-    inp.style.cssText = 'width:100%;background:#e0d8c8;border:1px solid #c8bfaa;border-radius:8px;color:#1a1a1a;font-size:13px;padding:10px;box-sizing:border-box';
+    inp.style.cssText = 'width:100%;background:#f5f6f7;border:1px solid #d9d9d9;border-radius:4px;color:#32363a;font-size:13px;padding:10px;box-sizing:border-box';
     wrap.appendChild(lbl); wrap.appendChild(inp);
     box.appendChild(wrap);
     return inp;
@@ -1261,7 +1261,7 @@ function setEmailTo() {
   btnRow.style.cssText = 'display:flex;gap:8px;margin-top:4px';
 
   const saveBtn = document.createElement('button');
-  saveBtn.style.cssText = 'flex:1;background:#c0392b;border:none;border-radius:8px;color:#fff;padding:12px;font-size:14px;font-weight:bold;cursor:pointer';
+  saveBtn.style.cssText = 'flex:1;background:#0a6ed1;border:none;border-radius:4px;color:#fff;padding:12px;font-size:14px;font-weight:bold;cursor:pointer';
   saveBtn.textContent = '保存';
   saveBtn.addEventListener('click', () => {
     localStorage.setItem('statsApp_emailTo', toInp.value.trim());
@@ -1270,7 +1270,7 @@ function setEmailTo() {
   });
 
   const cancelBtn = document.createElement('button');
-  cancelBtn.style.cssText = 'flex:1;background:#e0d8c8;border:none;border-radius:8px;color:#1a1a1a;padding:12px;font-size:13px;cursor:pointer';
+  cancelBtn.style.cssText = 'flex:1;background:#f5f6f7;border:1px solid #bbb;border-radius:4px;color:#354a5e;padding:12px;font-size:13px;cursor:pointer';
   cancelBtn.textContent = 'キャンセル';
   cancelBtn.addEventListener('click', () => overlay.remove());
 
@@ -1309,10 +1309,10 @@ function restoreAuto() {
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
 
   const box = document.createElement('div');
-  box.style.cssText = 'background:#ede8dc;border-radius:14px;padding:20px;width:100%;max-width:380px;max-height:80vh;overflow-y:auto';
+  box.style.cssText = 'background:#fff;border-radius:8px;padding:20px;width:100%;max-width:380px;max-height:80vh;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.2)';
 
   const title = document.createElement('div');
-  title.style.cssText = 'font-size:16px;font-weight:bold;color:#c47a1a;margin-bottom:14px';
+  title.style.cssText = 'font-size:16px;font-weight:bold;color:#354a5e;margin-bottom:14px;border-bottom:2px solid #0a6ed1;padding-bottom:8px';
   title.textContent = '保存済みデータを選択';
   box.appendChild(title);
 
@@ -1324,14 +1324,14 @@ function restoreAuto() {
     } catch(e) {}
 
     const row = document.createElement('div');
-    row.style.cssText = 'background:#e0d8c8;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center';
+    row.style.cssText = 'background:#f5f6f7;border:1px solid #e0e0e0;border-radius:6px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center';
 
     const nameSpan = document.createElement('span');
-    nameSpan.style.cssText = 'font-size:14px;color:#1a1a1a;flex:1';
+    nameSpan.style.cssText = 'font-size:14px;color:#32363a;flex:1';
     nameSpan.textContent = label;
 
     const btn = document.createElement('button');
-    btn.style.cssText = 'font-size:13px;color:#fff;background:#c0392b;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;flex-shrink:0;margin-left:8px';
+    btn.style.cssText = 'font-size:13px;color:#fff;background:#0a6ed1;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;flex-shrink:0;margin-left:8px';
     btn.textContent = '復元';
     btn.addEventListener('click', () => doRestore(k));
 
@@ -1344,12 +1344,12 @@ function restoreAuto() {
   btnRow.style.cssText = 'display:flex;gap:8px;margin-top:8px';
 
   const delBtn = document.createElement('button');
-  delBtn.style.cssText = 'flex:1;background:none;border:1px solid #c0392b;border-radius:8px;color:#c0392b;padding:10px;font-size:13px;cursor:pointer';
+  delBtn.style.cssText = 'flex:1;background:#fff;border:1px solid #e00;border-radius:4px;color:#e00;padding:10px;font-size:13px;cursor:pointer';
   delBtn.textContent = '全て削除';
   delBtn.addEventListener('click', clearAllSaved);
 
   const cancelBtn = document.createElement('button');
-  cancelBtn.style.cssText = 'flex:1;background:#e0d8c8;border:none;border-radius:8px;color:#1a1a1a;padding:10px;font-size:13px;cursor:pointer';
+  cancelBtn.style.cssText = 'flex:1;background:#f5f6f7;border:1px solid #bbb;border-radius:4px;color:#354a5e;padding:10px;font-size:13px;cursor:pointer';
   cancelBtn.textContent = 'キャンセル';
   cancelBtn.addEventListener('click', () => document.getElementById('restore-overlay').remove());
 
@@ -1471,21 +1471,21 @@ function showJsonFallback(json, fileName) {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px';
   const box = document.createElement('div');
-  box.style.cssText = 'background:#ede8dc;border-radius:14px;padding:16px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px';
+  box.style.cssText = 'background:#fff;border-radius:8px;padding:16px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,0.2)';
 
   const title = document.createElement('div');
-  title.style.cssText = 'font-size:14px;font-weight:bold;color:#c47a1a';
+  title.style.cssText = 'font-size:14px;font-weight:bold;color:#354a5e;border-bottom:2px solid #0a6ed1;padding-bottom:6px';
   title.textContent = '📋 ' + fileName;
   box.appendChild(title);
 
   const hint = document.createElement('div');
-  hint.style.cssText = 'font-size:12px;color:#7a7060';
+  hint.style.cssText = 'font-size:12px;color:#6a6d70';
   hint.textContent = '全選択してコピー → メモアプリ等に貼り付けて保存してください';
   box.appendChild(hint);
 
   const ta = document.createElement('textarea');
   ta.value = json;
-  ta.style.cssText = 'width:100%;height:200px;background:#e0d8c8;border:1px solid #c8bfaa;border-radius:8px;color:#1a1a1a;font-size:11px;padding:8px;resize:none;font-family:monospace;box-sizing:border-box';
+  ta.style.cssText = 'width:100%;height:200px;background:#f5f6f7;border:1px solid #d9d9d9;border-radius:4px;color:#32363a;font-size:11px;padding:8px;resize:none;font-family:monospace;box-sizing:border-box';
   ta.addEventListener('focus', () => ta.select());
   box.appendChild(ta);
 
@@ -1493,7 +1493,7 @@ function showJsonFallback(json, fileName) {
   btnRow.style.cssText = 'display:flex;gap:8px';
 
   const copyBtn = document.createElement('button');
-  copyBtn.style.cssText = 'flex:1;background:#c0392b;border:none;border-radius:8px;color:#fff;padding:12px;font-size:14px;font-weight:bold;cursor:pointer';
+  copyBtn.style.cssText = 'flex:1;background:#0a6ed1;border:none;border-radius:4px;color:#fff;padding:12px;font-size:14px;font-weight:bold;cursor:pointer';
   copyBtn.textContent = '📋 コピー';
   copyBtn.addEventListener('click', () => {
     ta.select();
@@ -1504,7 +1504,7 @@ function showJsonFallback(json, fileName) {
   });
 
   const closeBtn = document.createElement('button');
-  closeBtn.style.cssText = 'flex:1;background:#e0d8c8;border:none;border-radius:8px;color:#1a1a1a;padding:12px;font-size:13px;cursor:pointer';
+  closeBtn.style.cssText = 'flex:1;background:#f5f6f7;border:1px solid #bbb;border-radius:4px;color:#354a5e;padding:12px;font-size:13px;cursor:pointer';
   closeBtn.textContent = '閉じる';
   closeBtn.addEventListener('click', () => overlay.remove());
 
@@ -1913,7 +1913,7 @@ function addPlayer() {
   </div>
   <div style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px">
 
-    <div style="background:#e0d8c8;border:1px solid var(--c-yellow);border-radius:12px;padding:12px 16px">
+    <div style="background:var(--c-panel);border:1px solid var(--c-yellow);border-radius:12px;padding:12px 16px">
       <div style="font-size:13px;font-weight:bold;color:var(--c-yellow);margin-bottom:6px">⚠️ 1日複数試合の場合</div>
       <p style="font-size:13px;color:var(--c-muted);line-height:1.7">
         • <b style="color:var(--c-text)">1試合目</b>：最新の <b style="color:var(--c-yellow)">stats_yyyymmdd.xlsx</b> を選択<br>
