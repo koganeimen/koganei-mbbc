@@ -93,29 +93,20 @@ function writeToExcel() {
     const outName = 'stats_' + yyyymmdd + '.xlsx';
     const wbout = XLSX.write(wb, {bookType:'xlsx', type:'array'});
     const dlBlob = new Blob([wbout], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-    const file = new File([dlBlob], outName, {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 
-    const isIosSafari = /iP(hone|ad|od)/.test(navigator.userAgent) && !navigator.userAgent.includes('CriOS') && !navigator.userAgent.includes('FxiOS');
-    const isIos = /iP(hone|ad|od)/.test(navigator.userAgent);
-
-    if(isIosSafari && navigator.share && navigator.canShare && navigator.canShare({files:[file]})) {
-      // Safari: Web Share API → ネイティブ共有シート
-      status.style.color = 'var(--c-green)';
-      status.textContent = '✓ 完了！「' + sheetName + '」を追加しました。';
-      navigator.share({files:[file], title: outName})
-        .catch(e => { if(e.name !== 'AbortError') showIosChromeSave(wbout, outName, sheetName, status); });
-      return;
+    // iOS Safari: use Web Share API to save to Files/iCloud
+    if(navigator.share && navigator.canShare) {
+      const file = new File([dlBlob], outName, {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+      if(navigator.canShare({files:[file]})) {
+        status.style.color = 'var(--c-green)';
+        status.textContent = '✓ 完了！「' + sheetName + '」を追加しました。';
+        navigator.share({files:[file], title: outName})
+          .catch(e => { if(e.name !== 'AbortError') showExcelBase64(wbout, outName, sheetName, status); });
+        return;
+      }
     }
 
-    if(isIos) {
-      // iOS Chrome など: data URLをモーダルで表示（ページ遷移なし）
-      status.style.color = 'var(--c-green)';
-      status.textContent = '✓ 完了！「' + sheetName + '」を追加しました。';
-      showIosChromeSave(wbout, outName, sheetName, status);
-      return;
-    }
-
-    // Desktop / Android: blob download
+    // Desktop: blob download
     try {
       const dlUrl = URL.createObjectURL(dlBlob);
       const dlA = document.createElement('a');
@@ -124,9 +115,9 @@ function writeToExcel() {
       document.body.removeChild(dlA);
       setTimeout(() => URL.revokeObjectURL(dlUrl), 1000);
       status.style.color = 'var(--c-green)';
-      status.textContent = '✓ 完了！「' + sheetName + '」を追加しました。';
+      status.textContent = '✓ 完了！「' + sheetName + '」を追加しました。\nファイルをダウンロードしました。';
     } catch(e) {
-      showIosChromeSave(wbout, outName, sheetName, status);
+      showExcelBase64(wbout, outName, sheetName, status);
     }
 
   } catch(e) {
@@ -550,7 +541,7 @@ function writeStatsToSheet(ws) {
 <!-- ===== SETUP SCREEN ===== -->
 <div id="setup-screen" class="screen active">
   <h1>🏀 スタッツ入力</h1>
-  <div style="text-align:right;font-size:10px;color:var(--c-muted);margin-top:-12px;margin-bottom:8px">v20260703 10:25</div>
+  <div style="text-align:right;font-size:10px;color:var(--c-muted);margin-top:-12px;margin-bottom:8px">v20260707 09:30</div>
   <div class="field-group">
     <div class="field-label">試合日</div>
     <input type="date" id="setup-date">
@@ -1237,10 +1228,10 @@ function setEmailTo() {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
   const box = document.createElement('div');
-  box.style.cssText = 'background:#fff;border-radius:8px;padding:20px;width:100%;max-width:380px;box-shadow:0 4px 16px rgba(0,0,0,0.2)';
+  box.style.cssText = 'background:#ede8dc;border-radius:14px;padding:20px;width:100%;max-width:380px';
 
   const title = document.createElement('div');
-  title.style.cssText = 'font-size:15px;font-weight:bold;color:#354a5e;margin-bottom:14px;border-bottom:2px solid #0a6ed1;padding-bottom:8px';
+  title.style.cssText = 'font-size:15px;font-weight:bold;color:#c47a1a;margin-bottom:14px';
   title.textContent = '✉️ メール送信先を設定';
   box.appendChild(title);
 
@@ -1248,12 +1239,12 @@ function setEmailTo() {
     const wrap = document.createElement('div');
     wrap.style.marginBottom = '12px';
     const lbl = document.createElement('div');
-    lbl.style.cssText = 'font-size:12px;color:#6a6d70;margin-bottom:4px;font-weight:bold';
+    lbl.style.cssText = 'font-size:12px;color:#7a7060;margin-bottom:4px';
     lbl.textContent = labelText;
     const inp = document.createElement('input');
     inp.type = 'email';
     inp.value = value;
-    inp.style.cssText = 'width:100%;background:#f5f6f7;border:1px solid #d9d9d9;border-radius:4px;color:#32363a;font-size:13px;padding:10px;box-sizing:border-box';
+    inp.style.cssText = 'width:100%;background:#e0d8c8;border:1px solid #c8bfaa;border-radius:8px;color:#1a1a1a;font-size:13px;padding:10px;box-sizing:border-box';
     wrap.appendChild(lbl); wrap.appendChild(inp);
     box.appendChild(wrap);
     return inp;
@@ -1266,7 +1257,7 @@ function setEmailTo() {
   btnRow.style.cssText = 'display:flex;gap:8px;margin-top:4px';
 
   const saveBtn = document.createElement('button');
-  saveBtn.style.cssText = 'flex:1;background:#0a6ed1;border:none;border-radius:4px;color:#fff;padding:12px;font-size:14px;font-weight:bold;cursor:pointer';
+  saveBtn.style.cssText = 'flex:1;background:#c0392b;border:none;border-radius:8px;color:#fff;padding:12px;font-size:14px;font-weight:bold;cursor:pointer';
   saveBtn.textContent = '保存';
   saveBtn.addEventListener('click', () => {
     localStorage.setItem('statsApp_emailTo', toInp.value.trim());
@@ -1275,7 +1266,7 @@ function setEmailTo() {
   });
 
   const cancelBtn = document.createElement('button');
-  cancelBtn.style.cssText = 'flex:1;background:#f5f6f7;border:1px solid #bbb;border-radius:4px;color:#354a5e;padding:12px;font-size:13px;cursor:pointer';
+  cancelBtn.style.cssText = 'flex:1;background:#e0d8c8;border:none;border-radius:8px;color:#1a1a1a;padding:12px;font-size:13px;cursor:pointer';
   cancelBtn.textContent = 'キャンセル';
   cancelBtn.addEventListener('click', () => overlay.remove());
 
@@ -1311,13 +1302,13 @@ function restoreAuto() {
 
   const overlay = document.createElement('div');
   overlay.id = 'restore-overlay';
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(53,74,94,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
 
   const box = document.createElement('div');
-  box.style.cssText = 'background:#fff;border-radius:8px;padding:20px;width:100%;max-width:380px;max-height:80vh;overflow-y:auto;box-shadow:0 4px 16px rgba(0,0,0,0.2)';
+  box.style.cssText = 'background:#ede8dc;border-radius:14px;padding:20px;width:100%;max-width:380px;max-height:80vh;overflow-y:auto';
 
   const title = document.createElement('div');
-  title.style.cssText = 'font-size:16px;font-weight:bold;color:#354a5e;margin-bottom:14px;border-bottom:2px solid #0a6ed1;padding-bottom:8px';
+  title.style.cssText = 'font-size:16px;font-weight:bold;color:#c47a1a;margin-bottom:14px';
   title.textContent = '保存済みデータを選択';
   box.appendChild(title);
 
@@ -1329,14 +1320,14 @@ function restoreAuto() {
     } catch(e) {}
 
     const row = document.createElement('div');
-    row.style.cssText = 'background:#f5f6f7;border:1px solid #e0e0e0;border-radius:6px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center';
+    row.style.cssText = 'background:#e0d8c8;border-radius:10px;padding:12px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center';
 
     const nameSpan = document.createElement('span');
-    nameSpan.style.cssText = 'font-size:14px;color:#32363a;flex:1';
+    nameSpan.style.cssText = 'font-size:14px;color:#1a1a1a;flex:1';
     nameSpan.textContent = label;
 
     const btn = document.createElement('button');
-    btn.style.cssText = 'font-size:13px;color:#fff;background:#0a6ed1;border:none;border-radius:4px;padding:6px 12px;cursor:pointer;flex-shrink:0;margin-left:8px';
+    btn.style.cssText = 'font-size:13px;color:#fff;background:#c0392b;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;flex-shrink:0;margin-left:8px';
     btn.textContent = '復元';
     btn.addEventListener('click', () => doRestore(k));
 
@@ -1346,15 +1337,15 @@ function restoreAuto() {
   });
 
   const btnRow = document.createElement('div');
-  btnRow.style.cssText = 'display:flex;gap:8px;margin-top:12px';
+  btnRow.style.cssText = 'display:flex;gap:8px;margin-top:8px';
 
   const delBtn = document.createElement('button');
-  delBtn.style.cssText = 'flex:1;background:#fff;border:1px solid #e00;border-radius:4px;color:#e00;padding:10px;font-size:13px;cursor:pointer';
+  delBtn.style.cssText = 'flex:1;background:none;border:1px solid #c0392b;border-radius:8px;color:#c0392b;padding:10px;font-size:13px;cursor:pointer';
   delBtn.textContent = '全て削除';
   delBtn.addEventListener('click', clearAllSaved);
 
   const cancelBtn = document.createElement('button');
-  cancelBtn.style.cssText = 'flex:1;background:#f5f6f7;border:1px solid #bbb;border-radius:4px;color:#354a5e;padding:10px;font-size:13px;cursor:pointer';
+  cancelBtn.style.cssText = 'flex:1;background:#e0d8c8;border:none;border-radius:8px;color:#1a1a1a;padding:10px;font-size:13px;cursor:pointer';
   cancelBtn.textContent = 'キャンセル';
   cancelBtn.addEventListener('click', () => document.getElementById('restore-overlay').remove());
 
@@ -1437,48 +1428,6 @@ function exportJSON() {
   }
 }
 
-function showIosChromeSave(wbout, fileName, sheetName, statusEl) {
-  // iOS Chrome: convert to base64 data URL and show in modal with long-press instructions
-  const u8 = new Uint8Array(wbout);
-  let bin = '';
-  for(let i = 0; i < u8.length; i++) bin += String.fromCharCode(u8[i]);
-  const b64 = btoa(bin);
-  const dataUrl = 'data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,' + b64;
-
-  const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(53,74,94,0.8);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px';
-
-  const box = document.createElement('div');
-  box.style.cssText = 'background:#fff;border-radius:8px;padding:20px;width:100%;max-width:380px;box-shadow:0 4px 16px rgba(0,0,0,0.2)';
-
-  const title = document.createElement('div');
-  title.style.cssText = 'font-size:15px;font-weight:bold;color:#354a5e;border-bottom:2px solid #0a6ed1;padding-bottom:8px;margin-bottom:14px';
-  title.textContent = '✓ ' + fileName;
-  box.appendChild(title);
-
-  const msg = document.createElement('p');
-  msg.style.cssText = 'font-size:13px;color:#6a6d70;line-height:1.8;margin-bottom:14px';
-  msg.innerHTML = '下のボタンを<b>長押し</b> →「リンクを保存」でダウンロードできます。';
-  box.appendChild(msg);
-
-  const dlLink = document.createElement('a');
-  dlLink.href = dataUrl;
-  dlLink.download = fileName;
-  dlLink.style.cssText = 'display:block;background:#0a6ed1;color:#fff;border-radius:6px;padding:13px;text-align:center;font-size:15px;font-weight:bold;text-decoration:none;margin-bottom:10px';
-  dlLink.textContent = '📥 ' + fileName;
-  box.appendChild(dlLink);
-
-  const closeBtn = document.createElement('button');
-  closeBtn.style.cssText = 'width:100%;background:#f5f6f7;border:1px solid #bbb;border-radius:4px;color:#354a5e;padding:10px;font-size:13px;cursor:pointer';
-  closeBtn.textContent = '閉じる';
-  closeBtn.addEventListener('click', () => overlay.remove());
-  box.appendChild(closeBtn);
-
-  overlay.appendChild(box);
-  overlay.addEventListener('click', e => { if(e.target === overlay) overlay.remove(); });
-  document.body.appendChild(overlay);
-}
-
 function showExcelBase64(wbout, fileName, sheetName, statusEl) {
   // Fallback: show instruction to open in Safari
   if(statusEl) {
@@ -1518,21 +1467,21 @@ function showJsonFallback(json, fileName) {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px';
   const box = document.createElement('div');
-  box.style.cssText = 'background:#fff;border-radius:8px;padding:16px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,0.2)';
+  box.style.cssText = 'background:#ede8dc;border-radius:14px;padding:16px;width:100%;max-width:400px;display:flex;flex-direction:column;gap:10px';
 
   const title = document.createElement('div');
-  title.style.cssText = 'font-size:14px;font-weight:bold;color:#354a5e;border-bottom:2px solid #0a6ed1;padding-bottom:6px';
+  title.style.cssText = 'font-size:14px;font-weight:bold;color:#c47a1a';
   title.textContent = '📋 ' + fileName;
   box.appendChild(title);
 
   const hint = document.createElement('div');
-  hint.style.cssText = 'font-size:12px;color:#6a6d70';
+  hint.style.cssText = 'font-size:12px;color:#7a7060';
   hint.textContent = '全選択してコピー → メモアプリ等に貼り付けて保存してください';
   box.appendChild(hint);
 
   const ta = document.createElement('textarea');
   ta.value = json;
-  ta.style.cssText = 'width:100%;height:200px;background:#f5f6f7;border:1px solid #d9d9d9;border-radius:4px;color:#32363a;font-size:11px;padding:8px;resize:none;font-family:monospace;box-sizing:border-box';
+  ta.style.cssText = 'width:100%;height:200px;background:#e0d8c8;border:1px solid #c8bfaa;border-radius:8px;color:#1a1a1a;font-size:11px;padding:8px;resize:none;font-family:monospace;box-sizing:border-box';
   ta.addEventListener('focus', () => ta.select());
   box.appendChild(ta);
 
@@ -1540,7 +1489,7 @@ function showJsonFallback(json, fileName) {
   btnRow.style.cssText = 'display:flex;gap:8px';
 
   const copyBtn = document.createElement('button');
-  copyBtn.style.cssText = 'flex:1;background:#0a6ed1;border:none;border-radius:4px;color:#fff;padding:12px;font-size:14px;font-weight:bold;cursor:pointer';
+  copyBtn.style.cssText = 'flex:1;background:#c0392b;border:none;border-radius:8px;color:#fff;padding:12px;font-size:14px;font-weight:bold;cursor:pointer';
   copyBtn.textContent = '📋 コピー';
   copyBtn.addEventListener('click', () => {
     ta.select();
@@ -1551,7 +1500,7 @@ function showJsonFallback(json, fileName) {
   });
 
   const closeBtn = document.createElement('button');
-  closeBtn.style.cssText = 'flex:1;background:#f5f6f7;border:1px solid #bbb;border-radius:4px;color:#354a5e;padding:12px;font-size:13px;cursor:pointer';
+  closeBtn.style.cssText = 'flex:1;background:#e0d8c8;border:none;border-radius:8px;color:#1a1a1a;padding:12px;font-size:13px;cursor:pointer';
   closeBtn.textContent = '閉じる';
   closeBtn.addEventListener('click', () => overlay.remove());
 
@@ -1882,25 +1831,55 @@ function addPlayer() {
       <div style="font-size:16px;font-weight:bold;color:var(--c-yellow);margin-bottom:10px">⑦ このアプリのスマホへの入れ方</div>
 
       <div style="background:var(--c-panel);border-radius:8px;padding:12px;margin-bottom:12px;border-left:3px solid var(--c-accent)">
-        <div style="font-size:13px;font-weight:bold;color:var(--c-accent);margin-bottom:6px">STEP 1　ブラウザでアクセス</div>
+        <div style="font-size:13px;font-weight:bold;color:var(--c-accent);margin-bottom:6px">STEP 1　ダウンロード</div>
         <ol style="margin:0 0 0 16px;font-size:13px;color:var(--c-muted);line-height:2">
-          <li>iPhoneの <b style="color:var(--c-text)">Safari または Chrome</b> を開く</li>
-          <li>アドレスバーに以下を入力：<br><b style="color:var(--c-text);font-size:12px">koganeimen.github.io/koganei-mbbc/</b></li>
-          <li>アプリが表示されることを確認</li>
+          <li>下の「Google Drive を開く」をタップ</li>
+          <li><b style="color:var(--c-text)">KOGANEI MBBC.html</b> を長押し（または右上 ︙）</li>
+          <li><b style="color:var(--c-text)">「ダウンロード」</b>をタップ</li>
+          <li>ダウンロード完了後、<b style="color:var(--c-text)">「Filesで開く」</b>をタップ</li>
         </ol>
+      </div>
+
+      <div style="background:var(--c-panel);border-radius:8px;padding:12px;margin-bottom:12px;border-left:3px solid var(--c-accent)">
+        <div style="font-size:13px;font-weight:bold;color:var(--c-accent);margin-bottom:8px">STEP 2　Safariで開く（重要）</div>
+
+        <p style="font-size:13px;color:var(--c-muted);margin-bottom:6px"><b style="color:var(--c-text)">方法A（一番簡単）</b></p>
+        <ol style="margin:0 0 10px 16px;font-size:13px;color:var(--c-muted);line-height:2">
+          <li><b style="color:var(--c-text)">SafariでGoogle Driveを開く</b>（Google Driveアプリではなく）</li>
+          <li>ファイルをタップ → プレビューが開く</li>
+          <li>右上の <b style="color:var(--c-text)">「︙」または共有ボタン</b> → <b style="color:var(--c-text)">「ダウンロード」</b></li>
+          <li>ダウンロード完了後、Safariの <b style="color:var(--c-text)">↓アイコン</b>（アドレスバー右横）をタップ</li>
+          <li>ファイル名をタップ → そのままSafariで開く ✅</li>
+        </ol>
+
+        <p style="font-size:13px;color:var(--c-muted);margin-bottom:6px"><b style="color:var(--c-text)">方法B（Filesアプリから）</b></p>
+        <ol style="margin:0 0 0 16px;font-size:13px;color:var(--c-muted);line-height:2">
+          <li>Filesアプリ → ファイルを<b style="color:var(--c-text)">長押し</b></li>
+          <li><b style="color:var(--c-text)">「情報を見る」</b>をタップ</li>
+          <li>「デフォルトのアプリ」→ <b style="color:var(--c-text)">Safari</b> を選択</li>
+          <li>以降はタップするだけでSafariで開く ✅</li>
+        </ol>
+
+        <p style="font-size:12px;color:var(--c-accent);margin-top:10px">⚠️ Safariで開かないとExcel書き込み・JSON保存が使えません</p>
       </div>
 
       <div style="background:var(--c-panel);border-radius:8px;padding:12px;margin-bottom:12px;border-left:3px solid var(--c-green)">
-        <div style="font-size:13px;font-weight:bold;color:var(--c-green);margin-bottom:6px">STEP 2　ホーム画面に追加（Safariのみ）</div>
+        <div style="font-size:13px;font-weight:bold;color:var(--c-green);margin-bottom:6px">STEP 3　ホーム画面に追加</div>
         <ol style="margin:0 0 0 16px;font-size:13px;color:var(--c-muted);line-height:2">
-          <li>Safari下部の <b style="color:var(--c-text)">共有ボタン（□↑）</b>をタップ</li>
+          <li>Safariでアプリが開いたら、下部の <b style="color:var(--c-text)">共有ボタン（□↑）</b>をタップ</li>
           <li><b style="color:var(--c-text)">「ホーム画面に追加」</b>をタップ</li>
           <li>名前を確認して <b style="color:var(--c-text)">「追加」</b>をタップ</li>
-          <li>ホーム画面にアイコンが追加され、アプリのように起動できます ✅</li>
+          <li>ホーム画面にアイコンが追加され、アプリのように使えます</li>
         </ol>
       </div>
 
-      <p style="font-size:12px;color:var(--c-muted);margin-top:4px">※ Safari・Chrome どちらでも使えます</p>
+      <a href="https://drive.google.com/drive/folders/1ya8Cav_8ISoQb9czw7T4rS7rJvx64fRE"
+         target="_blank"
+         style="display:block;margin-top:4px;background:var(--c-accent);color:#fff;border-radius:8px;
+                padding:12px 16px;text-align:center;font-size:14px;font-weight:bold;text-decoration:none">
+        📂 Google Drive を開く
+      </a>
+      <p style="margin-top:10px;font-size:12px;color:var(--c-muted)">※ 最新バージョンのファイルが保存されています</p>
     </div>
 
     <div style="background:var(--c-card);border-radius:12px;padding:14px 16px;margin-bottom:14px">
